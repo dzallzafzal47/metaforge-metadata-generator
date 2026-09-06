@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="MetaForge is a browser-based metadata generator with multi-format export."
+  />
+  <title>MetaForge — Metadata Generator</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"
+    defer
+  ></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">METADATA WORKSPACE</p>
+        <h1>MetaForge</h1>
+        <p class="subtitle">
+          Create structured metadata once, preview it instantly, and export it
+          into reusable metadata formats.
+        </p>
+      </div>
+
+      <div class="hero-actions">
+        <button class="secondary-btn" id="loadDraftBtn" type="button">Load Draft</button>
+        <button class="primary-btn" id="saveDraftBtn" type="button">Save Draft</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel editor-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="section-kicker">EDITOR</p>
+            <h2>Metadata Record</h2>
+          </div>
+          <button class="text-btn danger-text" id="clearFormBtn" type="button">Clear</button>
+        </div>
+
+        <form id="metadataForm">
+          <div class="form-grid">
+            <label class="full-width">
+              <span>Title <b>*</b></span>
+              <input
+                id="title"
+                name="title"
+                type="text"
+                placeholder="e.g. Digital Library User Guide"
+                required
+              />
+            </label>
+
+            <label>
+              <span>Creator</span>
+              <input
+                id="creator"
+                name="creator"
+                type="text"
+                placeholder="Author, organization, or creator"
+              />
+            </label>
+
+            <label>
+              <span>Subject</span>
+              <input
+                id="subject"
+                name="subject"
+                type="text"
+                placeholder="Main topic or subject"
+              />
+            </label>
+
+            <label class="full-width">
+              <span>Description</span>
+              <textarea
+                id="description"
+                name="description"
+                rows="4"
+                placeholder="Describe the resource..."
+              ></textarea>
+            </label>
+
+            <label>
+              <span>Publisher</span>
+              <input
+                id="publisher"
+                name="publisher"
+                type="text"
+                placeholder="Publisher or institution"
+              />
+            </label>
+
+            <label>
+              <span>Contributor</span>
+              <input
+                id="contributor"
+                name="contributor"
+                type="text"
+                placeholder="Editor, contributor, collaborator"
+              />
+            </label>
+
+            <label>
+              <span>Date</span>
+              <input id="date" name="date" type="date" />
+            </label>
+
+            <label>
+              <span>Type</span>
+              <select id="type" name="type">
+                <option value="">Select resource type</option>
+                <option>Text</option>
+                <option>Image</option>
+                <option>Audio</option>
+                <option>Video</option>
+                <option>Dataset</option>
+                <option>Software</option>
+                <option>Collection</option>
+                <option>Interactive Resource</option>
+                <option>Physical Object</option>
+                <option>Event</option>
+                <option>Service</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Format</span>
+              <input
+                id="format"
+                name="format"
+                type="text"
+                placeholder="e.g. application/pdf"
+              />
+            </label>
+
+            <label>
+              <span>Identifier</span>
+              <input
+                id="identifier"
+                name="identifier"
+                type="text"
+                placeholder="DOI, ISBN, URI, accession number..."
+              />
+            </label>
+
+            <label>
+              <span>Source</span>
+              <input
+                id="source"
+                name="source"
+                type="text"
+                placeholder="Source resource or collection"
+              />
+            </label>
+
+            <label>
+              <span>Language</span>
+              <input
+                id="language"
+                name="language"
+                type="text"
+                placeholder="e.g. en, id"
+              />
+            </label>
+
+            <label>
+              <span>Relation</span>
+              <input
+                id="relation"
+                name="relation"
+                type="text"
+                placeholder="Related resource"
+              />
+            </label>
+
+            <label>
+              <span>Coverage</span>
+              <input
+                id="coverage"
+                name="coverage"
+                type="text"
+                placeholder="Place, period, jurisdiction..."
+              />
+            </label>
+
+            <label class="full-width">
+              <span>Rights</span>
+              <input
+                id="rights"
+                name="rights"
+                type="text"
+                placeholder="License or copyright statement"
+              />
+            </label>
+
+            <label class="full-width">
+              <span>Keywords</span>
+              <input
+                id="keywords"
+                name="keywords"
+                type="text"
+                placeholder="Separate keywords with commas"
+              />
+            </label>
+          </div>
+        </form>
+
+        <div class="custom-fields">
+          <div class="subheading">
+            <div>
+              <p class="section-kicker">OPTIONAL</p>
+              <h3>Custom Fields</h3>
+            </div>
+            <button class="secondary-btn small-btn" id="addFieldBtn" type="button">
+              + Add Field
+            </button>
+          </div>
+
+          <div id="customFieldsList" class="custom-fields-list"></div>
+        </div>
+      </section>
+
+      <aside class="right-column">
+        <section class="panel preview-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker">LIVE PREVIEW</p>
+              <h2>Record Preview</h2>
+            </div>
+            <span class="record-status" id="recordStatus">Draft</span>
+          </div>
+
+          <div class="preview-card" id="previewCard">
+            <div class="empty-preview">
+              Start filling the form to build a metadata record.
+            </div>
+          </div>
+        </section>
+
+        <section class="panel export-panel">
+          <div class="panel-heading compact">
+            <div>
+              <p class="section-kicker">EXPORT</p>
+              <h2>Download Metadata</h2>
+            </div>
+          </div>
+
+          <p class="panel-copy">
+            Export the current record into common structured and human-readable formats.
+          </p>
+
+          <div class="export-grid">
+            <button class="export-btn" data-export="dcxml" type="button">
+              <strong>Dublin Core XML</strong>
+              <span>.xml</span>
+            </button>
+
+            <button class="export-btn" data-export="xml" type="button">
+              <strong>Generic XML</strong>
+              <span>.xml</span>
+            </button>
+
+            <button class="export-btn" data-export="csv" type="button">
+              <strong>CSV</strong>
+              <span>.csv</span>
+            </button>
+
+            <button class="export-btn" data-export="json" type="button">
+              <strong>JSON</strong>
+              <span>.json</span>
+            </button>
+
+            <button class="export-btn" data-export="yaml" type="button">
+              <strong>YAML</strong>
+              <span>.yaml</span>
+            </button>
+
+            <button class="export-btn" data-export="rdf" type="button">
+              <strong>RDF/XML</strong>
+              <span>.rdf</span>
+            </button>
+
+            <button class="export-btn" data-export="bibtex" type="button">
+              <strong>BibTeX</strong>
+              <span>.bib</span>
+            </button>
+
+            <button class="export-btn" data-export="txt" type="button">
+              <strong>Plain Text</strong>
+              <span>.txt</span>
+            </button>
+
+            <button class="export-btn export-featured" data-export="pdf" type="button">
+              <strong>PDF Record</strong>
+              <span>.pdf</span>
+            </button>
+          </div>
+
+          <div class="export-note">
+            PDF export uses jsPDF in the browser. Other export formats are generated locally with JavaScript.
+          </div>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <template id="customFieldTemplate">
+    <div class="custom-field-row">
+      <input class="custom-name" type="text" placeholder="Field name" aria-label="Custom field name" />
+      <input class="custom-value" type="text" placeholder="Field value" aria-label="Custom field value" />
+      <button class="icon-btn remove-field-btn" type="button" aria-label="Remove custom field">×</button>
+    </div>
+  </template>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
